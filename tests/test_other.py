@@ -10744,7 +10744,7 @@ int main() {
     self.add_pre_run('console.log("calling foo"); Module["_foo"]();')
     self.build('#include <stdio.h>\nint foo() { puts("foo called"); return 3; }', self.get_dir(), 'foo.c')
     err = self.expect_fail(NODE_JS + ['foo.c.o.js'], stdout=PIPE)
-    self.assertContained('native function `foo` called before runtime intialization', err)
+    self.assertContained('native function `foo` called before runtime initialization', err)
 
   def test_native_call_after_exit(self):
     self.set_setting('ASSERTIONS')
