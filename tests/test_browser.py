@@ -821,8 +821,10 @@ window.close = function() {
     self.btest('sdl_canvas_alpha.c', args=['--pre-js', 'flag_0.js', '-lSDL', '-lGL'], reference='sdl_canvas_alpha_flag_0.png', reference_slack=12)
 
   def get_async_args(self):
+    assert self.is_wasm_backend()
     return ['-s', 'ASYNCIFY']
 
+  @no_fastcomp("no asyncify support")
   def test_sdl_key(self):
     for delay in [0, 1]:
       for defines in [
@@ -1309,6 +1311,7 @@ keydown(100);keyup(100); // trigger the end
     self.btest(path_from_root('tests', 'fs', 'test_idbfs_sync.c'), '1', force_c=True, args=['-lidbfs.js', '-DFIRST', '-DSECRET=\"' + secret + '\"', '-s', '''EXPORTED_FUNCTIONS=['_main', '_test', '_success']''', '-s', 'EXIT_RUNTIME=1', '-DFORCE_EXIT', '-lidbfs.js'])
     self.btest(path_from_root('tests', 'fs', 'test_idbfs_sync.c'), '1', force_c=True, args=['-lidbfs.js', '-DSECRET=\"' + secret + '\"', '-s', '''EXPORTED_FUNCTIONS=['_main', '_test', '_success']''', '-s', 'EXIT_RUNTIME=1', '-DFORCE_EXIT', '-lidbfs.js'])
 
+  @no_fastcomp("no asyncify support")
   def test_fs_idbfs_fsync(self):
     # sync from persisted state into memory before main()
     create_test_file('pre.js', '''
@@ -1329,6 +1332,7 @@ keydown(100);keyup(100); // trigger the end
     self.btest(path_from_root('tests', 'fs', 'test_idbfs_fsync.c'), '1', force_c=True, args=args + ['-DFIRST', '-DSECRET=\"' + secret + '\"', '-s', '''EXPORTED_FUNCTIONS=['_main', '_success']''', '-lidbfs.js'])
     self.btest(path_from_root('tests', 'fs', 'test_idbfs_fsync.c'), '1', force_c=True, args=args + ['-DSECRET=\"' + secret + '\"', '-s', '''EXPORTED_FUNCTIONS=['_main', '_success']''', '-lidbfs.js'])
 
+  @no_fastcomp("no asyncify support")
   def test_fs_memfs_fsync(self):
     args = self.get_async_args() + ['-s', 'EXIT_RUNTIME=1']
     secret = str(time.time())
@@ -1418,11 +1422,13 @@ keydown(100);keyup(100); // trigger the end
       self.clear()
       self.btest(path_from_root('tests', 'idbstore.c'), str(stage), force_c=True, args=['-lidbstore.js', '-DSTAGE=' + str(stage), '-DSECRET=\"' + secret + '\"'])
 
+  @no_fastcomp("no asyncify support")
   def test_idbstore_sync(self):
     secret = str(time.time())
     self.clear()
     self.btest(path_from_root('tests', 'idbstore_sync.c'), '6', force_c=True, args=['-lidbstore.js', '-DSECRET=\"' + secret + '\"', '--memory-init-file', '1', '-O3', '-g2'] + self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_idbstore_sync_worker(self):
     secret = str(time.time())
     self.clear()
@@ -2401,6 +2407,7 @@ void *getBindBuffer() {
     self.compile_btest([path_from_root('tests', 'worker_api_3_worker.cpp'), '-o', 'worker.js', '-s', 'BUILD_AS_WORKER=1', '-s', 'EXPORTED_FUNCTIONS=["_one"]'])
     self.btest('worker_api_3_main.cpp', expected='5')
 
+  @no_fastcomp("no asyncify support")
   def test_worker_api_sleep(self):
     self.compile_btest([path_from_root('tests', 'worker_api_worker_sleep.cpp'), '-o', 'worker.js', '-s', 'BUILD_AS_WORKER=1', '-s', 'EXPORTED_FUNCTIONS=["_one"]'] + self.get_async_args())
     self.btest('worker_api_main.cpp', expected='566')
@@ -2697,10 +2704,12 @@ Module["preRun"].push(function () {
       self.btest(path_from_root('tests', 'codemods.cpp'), expected='1', args=opts + ['-s', 'PRECISE_F32=1'])
       self.btest(path_from_root('tests', 'codemods.cpp'), expected='1', args=opts + ['-s', 'PRECISE_F32=2', '--separate-asm']) # empty polyfill, but browser has support, so semantics are like float
 
+  @no_fastcomp("no asyncify support")
   def test_wget(self):
     create_test_file('test.txt', 'emscripten')
     self.btest(path_from_root('tests', 'test_wget.c'), expected='1', args=self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_wget_data(self):
     create_test_file('test.txt', 'emscripten')
     self.btest(path_from_root('tests', 'test_wget_data.c'), expected='1', args=['-O2', '-g2'] + self.get_async_args())
@@ -3248,26 +3257,31 @@ window.close = function() {
                      '-Wno-inconsistent-missing-override'],
                message='You should see Cocos2d logo')
 
+  @no_fastcomp("no asyncify support")
   def test_async(self):
     for opts in [0, 1, 2, 3]:
       print(opts)
       self.btest('browser/async.cpp', '1', args=['-O' + str(opts), '-g2'] + self.get_async_args())
 
   @requires_threads
+  @no_fastcomp("no asyncify support")
   def test_async_in_pthread(self):
     self.btest('browser/async.cpp', '1', args=self.get_async_args() + ['-s', 'USE_PTHREADS=1', '-s', 'PROXY_TO_PTHREAD=1', '-g'])
 
+  @no_fastcomp("no asyncify support")
   def test_async_2(self):
     # Error.stackTraceLimit default to 10 in chrome but this test relies on more
     # than 40 stack frames being reported.
     create_test_file('pre.js', 'Error.stackTraceLimit = 80;\n')
     self.btest('browser/async_2.cpp', '40', args=['-O3', '--pre-js', 'pre.js'] + self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_async_virtual(self):
     for opts in [0, 3]:
       print(opts)
       self.btest('browser/async_virtual.cpp', '5', args=['-O' + str(opts), '-profiling'] + self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_async_virtual_2(self):
     for opts in [0, 3]:
       print(opts)
@@ -3275,6 +3289,7 @@ window.close = function() {
 
   # Test async sleeps in the presence of invoke_* calls, which can happen with
   # longjmp or exceptions.
+  @no_fastcomp("no asyncify support")
   @parameterized({
     'O0': ([],), # noqa
     'O3': (['-O3'],), # noqa
@@ -3282,21 +3297,26 @@ window.close = function() {
   def test_async_longjmp(self, args):
     self.btest('browser/async_longjmp.cpp', '2', args=args + self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_async_mainloop(self):
     for opts in [0, 3]:
       print(opts)
       self.btest('browser/async_mainloop.cpp', '121', args=['-O' + str(opts)] + self.get_async_args())
 
   @requires_sound_hardware
+  @no_fastcomp("no asyncify support")
   def test_sdl_audio_beep_sleep(self):
     self.btest('sdl_audio_beep_sleep.cpp', '1', args=['-Os', '-s', 'ASSERTIONS=1', '-s', 'DISABLE_EXCEPTION_CATCHING=0', '-profiling', '-s', 'SAFE_HEAP=1', '-lSDL'] + self.get_async_args(), timeout=90)
 
+  @no_fastcomp("no asyncify support")
   def test_mainloop_reschedule(self):
     self.btest('mainloop_reschedule.cpp', '1', args=['-Os'] + self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_mainloop_infloop(self):
     self.btest('mainloop_infloop.cpp', '1', args=self.get_async_args())
 
+  @no_fastcomp("no asyncify support")
   def test_async_iostream(self):
     self.btest('browser/async_iostream.cpp', '1', args=self.get_async_args())
 
