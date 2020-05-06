@@ -259,6 +259,8 @@ def use_source_map(options):
 
 
 def will_metadce(options):
+  if shared.Settings.ASSERTIONS:
+    return False
   return shared.Settings.OPT_LEVEL >= 3 or shared.Settings.SHRINK_LEVEL >= 1
 
 
