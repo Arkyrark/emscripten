@@ -8120,6 +8120,7 @@ extern "C" {
     self.set_setting('ASYNCIFY', 1)
     self.set_setting('ASYNCIFY_IMPORTS', ['suspend'])
     self.set_setting('ASSERTIONS', 1)
+    self.emcc_args += ['--minify', '0']
     self.do_run_in_out_file_test('tests', 'core', 'asyncify_assertions')
 
   @no_fastcomp('wasm-backend specific feature')
